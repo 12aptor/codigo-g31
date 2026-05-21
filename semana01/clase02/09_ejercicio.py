@@ -110,6 +110,7 @@ while True:
             else:
                 nombre, email = pedir_datos()
                 actualizar_usuario(usuario, nombre, email)
+                print("\n✅ Usuario actualizado exitosamente.")
                 pausar()
 
         case "4":
@@ -118,7 +119,11 @@ while True:
                 pausar()
                 continue
             usuario = buscar_usuario(dni)
-            del usuario
+            if not usuario:
+                print(f"Usuario {dni} no encontrado")
+            else:
+                del usuarios[dni]
+                print("\n✅ Usuario eliminado exitosamente.")
             pausar()
         case "5":
             print("\nSaliendo de la aplicacion... ¡Hasta luego!")
