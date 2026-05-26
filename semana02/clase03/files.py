@@ -1,0 +1,15 @@
+file = open("test.txt", "r")
+print(file)
+content = file.read()
+print(content)
+print(type(content))
+file.close()
+
+students_file = open("alumnos.txt", "a")
+students_file.write("1,John,john@gmail.com,24\n")
+students_file.write("2,Ana,ana@gmail.com,30\n")
+students_file.close()
+
+students_file = open("alumnos.txt", "w")
+students_file.write("3,Miguel,miguel@gmail.com,28")
+students_file.close()

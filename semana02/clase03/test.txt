@@ -1,0 +1,10 @@
+Python
+Go
+Rust
+C#
+Java
+Typescript
+Javascript
+Perl
+Ruby
+Zig
