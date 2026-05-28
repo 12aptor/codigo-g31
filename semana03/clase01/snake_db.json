@@ -1,0 +1,20 @@
+[
+    {
+        "nro": 1,
+        "description": "Entrenamiento físico intensivo",
+        "category": "Disciplina",
+        "completed": false
+    },
+    {
+        "nro": 2,
+        "description": "Estudio de estructura de datos",
+        "category": "Desarrollo",
+        "completed": false
+    },
+    {
+        "nro": 3,
+        "description": "Revisión de logs del servidor",
+        "category": "Sistemas",
+        "completed": false
+    }
+]

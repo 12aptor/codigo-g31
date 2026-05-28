@@ -8,6 +8,8 @@ para gestionar tareas:
 from rich.console import Console
 from rich.table import Table
 from rich.panel import Panel
+from snake_db import SnakeDB
+from typing import Dict, Any
 
 # Modelo de datos
 class Task:
@@ -20,16 +22,24 @@ class Task:
     def complete_task(self):
         self.completed = True
 
+    def json(self) -> Dict[str, Any]:
+        return {
+            'nro': self.nro,
+            'description': self.description,
+            'category': self.category,
+            'completed': self.completed
+        }
+
 # Lógica de negocio
 class TaskManager:
     def __init__(self):
-        self.tasks = []
+        self.db = SnakeDB("snake_db.json")
 
     def add_task(self, task: Task):
-        self.tasks.append(task)
+        self.db.insert(task)
 
-    def get_tasks(self) -> list[Task]:
-        return self.tasks
+    def get_tasks(self):
+        return self.db.get_all()
 
 # Interfaz visual
 class Interface:
@@ -48,19 +58,19 @@ class Interface:
         table.add_column("Categoría", style="yellow")
         table.add_column("Estado", justify="center")
 
-        for t in self.manager.get_tasks():
-            status = "[bold green]✓[/bold green]" if t.completed else "[bold red]χ[/bold red]"
-            table.add_row(str(t.nro), t.description, t.category, status)
+        # for t in self.manager.get_tasks():
+        #     status = "[bold green]✓[/bold green]" if t.completed else "[bold red]χ[/bold red]"
+        #     table.add_row(str(t.nro), t.description, t.category, status)
         
         self.console.print(table)
 
 def main():
     manager = TaskManager()
-    manager.add_task(Task(1, "Entrenamiento físico intensivo", "Disciplina"))
-    manager.add_task(Task(2, "Estudio de estructura de datos", "Desarrollo"))
-    manager.add_task(Task(3, "Revisión de logs del servidor", "Sistemas"))
+    manager.add_task(Task(1, "Entrenamiento físico intensivo", "Disciplina").json())
+    manager.add_task(Task(2, "Estudio de estructura de datos", "Desarrollo").json())
+    manager.add_task(Task(3, "Revisión de logs del servidor", "Sistemas").json())
 
-    manager.get_tasks()[0].complete_task()
+    # manager.get_tasks()[0].complete_task()
 
     ui = Interface(manager)
     ui.show_welcome_ui()
@@ -68,3 +78,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+"""RETORNAMOS 9:21"""
