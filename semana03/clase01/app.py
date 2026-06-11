@@ -35,7 +35,7 @@ class TaskManager:
     def __init__(self):
         self.db = SnakeDB("snake_db.json")
 
-    def add_task(self, task: Task):
+    def add_task(self, task: Dict[str, Any]):
         self.db.insert(task)
 
     def get_tasks(self):
