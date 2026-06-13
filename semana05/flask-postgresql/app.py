@@ -33,9 +33,12 @@ def manage_users(user_id: int):
         response = user.get_by_id(user_id)
         return response
     elif method == 'PUT':
-        pass
+        data = request.get_json()
+        response = user.update(user_id, data)
+        return response
     elif method == 'DELETE':
-        pass
+        response = user.delete(user_id)
+        return response
 
 
 if __name__ == '__main__':
