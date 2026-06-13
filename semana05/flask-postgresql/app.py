@@ -25,12 +25,13 @@ def users():
         return response
     
 @app.route('/users/<int:user_id>', methods=['GET', 'PUT', 'DELETE'])
-def manage_users():
+def manage_users(user_id: int):
     method = request.method
     user = UserResource()
 
     if method == 'GET':
-        pass
+        response = user.get_by_id(user_id)
+        return response
     elif method == 'PUT':
         pass
     elif method == 'DELETE':
