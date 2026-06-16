@@ -2,9 +2,10 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 import os
-from sqlalchemy import DateTime, Text, func, select
+from sqlalchemy import DateTime, Text, func, select, Boolean
 from sqlalchemy.orm import Mapped, mapped_column, Session
 from datetime import datetime
+from flask_migrate import Migrate
 
 load_dotenv()
 
@@ -18,6 +19,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = f'postgresql://{db_user}:{db_password}@{db_host}:{db_port}/{db_name}'
 db = SQLAlchemy()
 db.init_app(app)
+migrate = Migrate(app, db)
 
 class User(db.Model):
     id: Mapped[int] = mapped_column(primary_key=True)
@@ -25,9 +27,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(unique=True)
     password: Mapped[str] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=func.now())
-
-with app.app_context():
-    db.create_all()
+    status: Mapped[bool] = mapped_column(Boolean, default=True)
 
 @app.route("/")
 def home():
