@@ -19,7 +19,7 @@ class User(db.Model):
             'id': self.id,
             'name': self.name,
             'email': self.email,
-            'document:number': self.document_number,
+            'document_number': self.document_number,
             'status': self.status,
             'created_at': str(self.created_at),
             'updated_at': str(self.updated_at)
