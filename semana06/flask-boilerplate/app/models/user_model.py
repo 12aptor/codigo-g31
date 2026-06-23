@@ -15,3 +15,15 @@ class User(db.Model):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now(), onupdate=func.now())
     role_id: Mapped[int] = mapped_column(ForeignKey('roles.id'), nullable=False)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'last_name': self.last_name,
+            'email': self.email,
+            'is_active': self.is_active,
+            'created_at': str(self.created_at),
+            'updated_at': str(self.updated_at),
+            'role_id': self.role_id
+        }
