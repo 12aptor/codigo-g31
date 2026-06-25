@@ -22,7 +22,8 @@ class CryptoHelper:
         self.fernet = Fernet(self._key)
 
     def encrypt(self, value: Union[str, int, float, bool]) -> str:
-        bytes_value = value.encode('utf-8')
+        string_value = str(value)
+        bytes_value = string_value.encode('utf-8')
         encrypted_value = self.fernet.encrypt(bytes_value)
         return encrypted_value.decode('utf-8')
     

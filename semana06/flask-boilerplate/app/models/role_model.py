@@ -7,3 +7,9 @@ class Role(db.Model):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, unique=True)
     name: Mapped[str] = mapped_column(String, nullable=True, unique=True)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name
+        }
