@@ -3,11 +3,20 @@ from flask import request
 from pydantic import ValidationError
 from db import db
 from app.schemas.product_schema import ProductSchema
+from app.utils.helpers import cloudinary_helper
+from app.services.product_service import product_service
 
 class ProductResource(Resource):
     def get(self):
         try:
-            pass
+            products = product_service.get_all()
+            products_list = []
+            for product in products:
+                secure_url = cloudinary_helper.get_secure_url(product.image)
+                product.image = secure_url
+                products_list.append(product.to_json())
+
+            return products_list, 200
         except Exception as e:
             return {
                 'error': str(e)
@@ -35,9 +44,32 @@ class ProductResource(Resource):
             
             validated_data = ProductSchema.model_validate(data)
             
-            return {
-                'ok': True
-            }
+            secure_url, public_id = cloudinary_helper.upload_image(
+                image,
+                'products'
+            )
+
+            if not secure_url:
+                return {
+                    'error': 'Error uploading image'
+                }, 400
+
+            next_code = 'P-00001'
+            product = product_service.get_last()
+
+            if product:
+                code = product.code
+                next_code = 'P-' + str(int(code.split('-')[1]) + 1).zfill(5)
+
+            created_product = product_service.create(
+                validated_data,
+                next_code,
+                public_id
+            )
+
+            created_product.image = secure_url
+
+            return created_product.to_json(), 200
         except ValidationError as e:
             return {
                 'error': e.errors()
@@ -46,3 +78,38 @@ class ProductResource(Resource):
             return {
                 'error': str(e)
             }, 400
+        
+class ManageProductResource(Resource):
+    def get(self, product_id: int):
+        try:
+            product = product_service.get_by_id(product_id)
+
+            if not product:
+                return {
+                    'error': 'Product not found'
+                }, 404
+            
+            return product.to_json(), 200
+        except Exception as e:
+            return {
+                'error': str(e)
+            }, 400
+
+    def put(self):
+        pass
+
+    def delete(self, product_id: int):
+        try:
+            product = product_service.delete(product_id)
+
+            if not product:
+                return {
+                    'error': 'Product not found'
+                }, 404
+            
+            return None, 200
+        except Exception as e:
+            return {
+                'error': str(e)
+            }, 400
+    

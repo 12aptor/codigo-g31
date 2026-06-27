@@ -16,3 +16,18 @@ class Product(db.Model):
     stock: Mapped[int] = mapped_column(Integer, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     category_id: Mapped[int] = mapped_column(ForeignKey('categories.id'), nullable=False)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'code': self.code,
+            'description': self.description,
+            'image': self.image,
+            'brand': self.brand,
+            'size': self.size,
+            'price': float(self.price),
+            'stock': self.stock,
+            'is_active': self.is_active,
+            'category_id': self.category_id
+        }
