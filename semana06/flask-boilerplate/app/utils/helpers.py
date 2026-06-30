@@ -84,6 +84,25 @@ class CloudinaryHelper:
             return secure_url[0]
         except Exception as e:
             return None
+        
+    def delete_image(self, public_id: str) -> bool:
+        try:
+            cloudinary.uploader.destroy(public_id)
+            return True
+        except Exception as e:
+            return False
+        
+    def validate_image(self, image: FileStorage) -> bool | tuple[bool, str]:
+        if not image:
+            raise Exception('Image is required')
+        
+        if image.filename == '':
+            raise Exception('Image is required')
+        
+        if image.content_type.startswith('image/'):
+            raise Exception('Invalid image type')
+        
+
 
 
         

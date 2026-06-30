@@ -13,3 +13,4 @@ api.add_resource(RoleResource, '/roles')
 api.add_resource(ManageRoleResource, '/roles/<int:role_id>')
 
 api.add_resource(ProductResource, '/products')
+api.add_resource(ManageProductResource, '/products/<int:product_id>')

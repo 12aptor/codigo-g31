@@ -27,20 +27,7 @@ class ProductResource(Resource):
             data = request.form
             image = request.files.get('image')
 
-            if not image:
-                return {
-                    'error': 'Image is required'
-                }, 400
-
-            if image.filename == '':
-                return {
-                    'error': 'Image is required'
-                }, 400
-
-            if not image.content_type.startswith('image/'):
-                return {
-                    'error': 'Invalid image type'
-                }, 400
+            cloudinary_helper.validate_image(image)
             
             validated_data = ProductSchema.model_validate(data)
             
@@ -95,8 +82,47 @@ class ManageProductResource(Resource):
                 'error': str(e)
             }, 400
 
-    def put(self):
-        pass
+    def put(self, product_id: int):
+        try:
+            data = request.form
+            validated_data = ProductSchema.model_validate(data)
+
+            product = product_service.get_by_id(product_id)
+
+            if not product:
+                return {
+                    'error': 'Product not found'
+                }, 404
+            
+            image = request.files.get('image')
+
+            if image:
+                cloudinary_helper.validate_image(image)
+                
+                secure_url, public_id = cloudinary_helper.upload_image(
+                    image,
+                    'products'
+                )
+                cloudinary_helper.delete_image(product.image)
+
+                if not secure_url:
+                    return {
+                        'error': 'Error uploading image'
+                    }, 400
+            
+            updated_product = product_service.update(
+                product,
+                validated_data,
+                public_id
+            )
+            
+            updated_product.image = secure_url
+
+            return updated_product.to_json(), 200
+        except Exception as e:
+            return {
+                'error': str(e)
+            }, 400
 
     def delete(self, product_id: int):
         try:
