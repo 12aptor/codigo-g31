@@ -126,12 +126,14 @@ class ManageProductResource(Resource):
 
     def delete(self, product_id: int):
         try:
-            product = product_service.delete(product_id)
+            product = product_service.get_by_id(product_id)
 
             if not product:
                 return {
                     'error': 'Product not found'
                 }, 404
+            
+            product_service.delete(product)
             
             return None, 200
         except Exception as e:

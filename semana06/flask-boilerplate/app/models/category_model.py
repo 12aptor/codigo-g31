@@ -8,3 +8,10 @@ class Category(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True, unique=True)
     name: Mapped[str] = mapped_column(String(255), nullable=False, unique=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
+
+    def to_json(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'is_active': self.is_active
+        }
