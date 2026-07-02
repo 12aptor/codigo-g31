@@ -1,6 +1,6 @@
 from db import db
 from sqlalchemy import Integer, String, DECIMAL, DateTime, func, ForeignKey, Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import datetime
 from enum import Enum
 
@@ -18,3 +18,34 @@ class Sale(db.Model):
     status: Mapped[str] = mapped_column(SQLEnum(SaleStatus), default=SaleStatus.PENDING, nullable=False) # PENDING, CONFIRMED, CANCELLED
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=func.now())
     customer_id: Mapped[int] = mapped_column(ForeignKey('customers.id'), nullable=False)
+
+    customer = relationship('Customer')
+    sale_details = relationship('SaleDetail')
+
+
+    def to_json(self):
+        items = []
+        for sale_detail in self.sale_details:
+            items.append({
+                'id': sale_detail.id,
+                'quantity': sale_detail.quantity,
+                'price': sale_detail.price,
+                'total': sale_detail.total,
+                'product': sale_detail.product
+            })
+
+        return {
+            'id': self.id,
+            'code': self.code,
+            'total': self.total,
+            'status': self.status,
+            'created_at': str(self.created_at),
+            'customer': {
+                'name': self.customer.name,
+                'last_name': self.customer.last_name,
+                'email': self.customer.email,
+                'document_number': self.customer.document_number,
+                'address': self.customer.address
+            },
+            'items': items
+        }

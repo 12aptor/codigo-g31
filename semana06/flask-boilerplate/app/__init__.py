@@ -15,7 +15,7 @@ from app.models import (
     customer_model,
     product_model,
     role_model,
-    sale_details_model,
+    sale_detail_model,
     sale_model,
     user_model
 )

@@ -1,6 +1,6 @@
 from db import db
 from sqlalchemy import Integer, DECIMAL, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 class SaleDetail(db.Model):
     __tablename__ = 'sale_details'
@@ -11,3 +11,5 @@ class SaleDetail(db.Model):
     total: Mapped[float] = mapped_column(DECIMAL(10, 4), nullable=False)
     product_id: Mapped[int] = mapped_column(ForeignKey('products.id'), nullable=False)
     sale_id: Mapped[int] = mapped_column(ForeignKey('sales.id'), nullable=False)
+
+    product = relationship('Product')
