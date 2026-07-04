@@ -2,6 +2,10 @@ from app.models.sale_model import Sale
 from db import db
 
 class SaleService:
+    def get_all(self) -> list[Sale]:
+        sales = Sale.query.all()
+        return sales
+
     def get_last(self) -> Sale | None:
         sale = Sale.query.order_by(
             Sale.id.desc()

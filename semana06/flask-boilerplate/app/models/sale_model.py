@@ -29,15 +29,20 @@ class Sale(db.Model):
             items.append({
                 'id': sale_detail.id,
                 'quantity': sale_detail.quantity,
-                'price': sale_detail.price,
-                'total': sale_detail.total,
-                'product': sale_detail.product
+                'price': float(sale_detail.price),
+                'total': float(sale_detail.total),
+                'product': {
+                    'id': sale_detail.product.id,
+                    'code': sale_detail.product.code,
+                    'name': sale_detail.product.name,
+                    'price': float(sale_detail.product.price),
+                }
             })
 
         return {
             'id': self.id,
             'code': self.code,
-            'total': self.total,
+            'total': float(self.total),
             'status': self.status,
             'created_at': str(self.created_at),
             'customer': {
