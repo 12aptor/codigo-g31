@@ -22,10 +22,22 @@ INSTALLED_APPS = [
 
     # Installed
     'rest_framework',
+    'drf_spectacular',
 
     # Created
     'blog',
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'REST Api de un blog de Código',
+    'DESCRIPTION': 'Documentación interactiva de los endpoints.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
