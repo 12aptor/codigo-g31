@@ -7,7 +7,7 @@ class Project(models.Model):
     workspace = models.ForeignKey(
         Workspace,
         on_delete=models.CASCADE,
-        related_name='workspaces'
+        related_name='projects'
     )
     name = models.CharField(max_length=100)
     description = models.TextField(blank=True)
@@ -20,7 +20,7 @@ class Tag(models.Model):
     workspace = models.ForeignKey(
         Workspace,
         on_delete=models.CASCADE,
-        related_name='workspaces'
+        related_name='tags'
     )
     name = models.CharField(max_length=50)
     color_hex = models.CharField(max_length=7, default='#808080')
@@ -51,7 +51,7 @@ class Issue(models.Model):
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
-        related_name='projects'
+        related_name='issues'
     )
     title = models.CharField(max_length=255)
     description = models.TextField(blank=True)
