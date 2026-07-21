@@ -2,8 +2,30 @@ from django.db import models
 from workspaces.models import Workspace
 from django.contrib.auth import get_user_model
 from cloudinary.models import CloudinaryField
+from django.utils import timezone
 
-class Project(models.Model):
+class SoftDeleteManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(deleted_at__isnull=True)
+
+class SoftDeleteModel(models.Model):
+    deleted_at = models.DateTimeField(null=True, blank=True)
+
+    objects = SoftDeleteManager()
+    all_objects = models.Manager()
+
+    class Meta:
+        abstract = True
+
+    def soft_delete(self):
+        self.deleted_at = timezone.now()
+        self.save()
+
+    def restore(self):
+        self.deleted_at = None
+        self.save()
+
+class Project(SoftDeleteModel):
     workspace = models.ForeignKey(
         Workspace,
         on_delete=models.CASCADE,
@@ -33,7 +55,7 @@ class Tag(models.Model):
             models.UniqueConstraint(fields=['workspace', 'name'], name='unique_tab_project')
         ]
 
-class Issue(models.Model):
+class Issue(SoftDeleteModel):
     class Status(models.TextChoices):
         BACKLOG = 'BACKLOG', 'Backlog'
         TODO = 'TODO', 'Por Hacer'

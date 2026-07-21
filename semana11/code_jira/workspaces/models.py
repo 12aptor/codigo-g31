@@ -2,8 +2,9 @@ from django.db import models
 from django.contrib.auth import get_user_model # Primera forma
 from users.models import User # Segunda forma
 from django.conf import settings # Tercera forma
+from projects.models import SoftDeleteModel
 
-class Workspace(models.Model):
+class Workspace(SoftDeleteModel):
     name = models.CharField(max_length=100)
     slug = models.SlugField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
