@@ -1,5 +1,7 @@
 from django.db import models
 from workspaces.models import Workspace
+from django.contrib.auth import get_user_model
+from cloudinary.models import CloudinaryField
 
 class Project(models.Model):
     workspace = models.ForeignKey(
@@ -40,6 +42,12 @@ class Issue(models.Model):
         DONE = 'DONE', 'Completado'
         CANCELED = 'CANCELED', 'Cancelado'
 
+    class Priority(models.TextChoices):
+        LOW = 'LOW', 'Baja'
+        MEDIUM = 'MEDIUM', 'Media'
+        HIGH = 'HIGH', 'Alta'
+        URGENT = 'URGENT', 'Urgente'
+
     project = models.ForeignKey(
         Project,
         on_delete=models.CASCADE,
@@ -52,3 +60,77 @@ class Issue(models.Model):
         choices=Status.choices,
         default=Status.BACKLOG
     )
+    priority = models.CharField(
+        max_length=20,
+        choices=Priority.choices,
+        default=Priority.MEDIUM
+    )
+    reporter = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        related_name='reported_issues',
+    )
+    assignee = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='assigned_issues',
+    )
+    parent_issue = models.ForeignKey(
+        'self',
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+        related_name='sub_issues'
+    )
+    tags = models.ManyToManyField(
+        Tag,
+        blank=True,
+        related_name='issues'
+    )
+    due_date = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+class IssueActivity(models.Model):
+    issue = models.ForeignKey(
+        Issue,
+        on_delete=models.CASCADE,
+        related_name='activities'
+    )
+    actor = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='activities'
+    )
+    field_changed = models.CharField(max_length=50)
+    old_value = models.CharField(max_length=255, blank=True, null=True)
+    new_value = models.CharField(max_length=255, blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        actor_name = self.actor.username if self.actor else 'Sistema'
+        return f"{actor_name} cambió {self.field_changed} en {self.issue.id}"
+
+    class Meta:
+        ordering = ['-created_at']
+
+class Attachment(models.Model):
+    issue = models.ForeignKey(
+        Issue,
+        on_delete=models.CASCADE,
+        related_name='attachments'
+    )
+    uploader = models.ForeignKey(
+        get_user_model(),
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='attachments'
+    )
+    file = CloudinaryField('file', folder='attachments')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Archivo para Issue #{self.issue.id}"
