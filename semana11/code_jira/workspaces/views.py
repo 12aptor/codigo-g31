@@ -1,6 +1,12 @@
 from rest_framework import generics
-from .models import Workspace
-from .serializers import WorkspaceSerializer
+from .models import (
+    Workspace,
+    WorkspaceMember,
+)
+from .serializers import (
+    WorkspaceSerializer,
+    WorkspaceMemberSerializer,
+)
 from drf_spectacular.utils import extend_schema, extend_schema_view
 
 @extend_schema(tags=['Workspace'])
@@ -36,3 +42,21 @@ class WorkspaceView(generics.ListCreateAPIView):
 class ManageWorkspaceView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Workspace.objects.all()
     serializer_class = WorkspaceSerializer
+
+    def perform_destroy(self, instance: Workspace):
+        instance.soft_delete()
+
+@extend_schema(tags=["Workspace"])
+@extend_schema_view(
+    get=extend_schema(
+        summary='Listar todos los Miembros del Workspace',
+        description='Obtiene una lista paginada de todos los usuarios activos Miembros del Workspace'
+    ),
+    post=extend_schema(
+        summary='Registrar un Miembro en un Workspace',
+        description='Añade un Usuario como Miembro de un Workspace. Solo accesible para usuarios autenticados.'
+    )
+)
+class WorkspaceMemberView(generics.ListCreateAPIView):
+    queryset = WorkspaceMember.objects.all()
+    serializer_class = WorkspaceMemberSerializer

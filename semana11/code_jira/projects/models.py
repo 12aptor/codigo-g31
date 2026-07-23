@@ -1,5 +1,4 @@
 from django.db import models
-from workspaces.models import Workspace
 from django.contrib.auth import get_user_model
 from cloudinary.models import CloudinaryField
 from django.utils import timezone
@@ -27,7 +26,7 @@ class SoftDeleteModel(models.Model):
 
 class Project(SoftDeleteModel):
     workspace = models.ForeignKey(
-        Workspace,
+        'workspaces.Workspace',
         on_delete=models.CASCADE,
         related_name='projects'
     )
@@ -40,7 +39,7 @@ class Project(SoftDeleteModel):
 
 class Tag(models.Model):
     workspace = models.ForeignKey(
-        Workspace,
+        'workspaces.Workspace',
         on_delete=models.CASCADE,
         related_name='tags'
     )
