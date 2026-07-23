@@ -2,6 +2,7 @@ from pathlib import Path
 from dotenv import load_dotenv
 import os
 import cloudinary
+from datetime import timedelta
 
 load_dotenv()
 
@@ -105,7 +106,8 @@ STATIC_URL = 'static/'
 AUTH_USER_MODEL = 'users.User'
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema'
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': ('rest_framework_simplejwt.authentication.JWTAuthentication',)
 }
 
 SPECTACULAR_SETTINGS = {
@@ -113,4 +115,9 @@ SPECTACULAR_SETTINGS = {
     'DESCRIPTION': 'Documentación interactiva de la Api',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=30),
 }

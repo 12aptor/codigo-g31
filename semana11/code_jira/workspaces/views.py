@@ -8,6 +8,7 @@ from .serializers import (
     WorkspaceMemberSerializer,
 )
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from rest_framework.permissions import IsAuthenticated
 
 @extend_schema(tags=['Workspace'])
 @extend_schema_view(
@@ -23,6 +24,13 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
 class WorkspaceView(generics.ListCreateAPIView):
     queryset = Workspace.objects.all()
     serializer_class = WorkspaceSerializer
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        pass
+
+
 
 @extend_schema(tags=['Workspace'])
 @extend_schema_view(
@@ -58,5 +66,12 @@ class ManageWorkspaceView(generics.RetrieveUpdateDestroyAPIView):
     )
 )
 class WorkspaceMemberView(generics.ListCreateAPIView):
-    queryset = WorkspaceMember.objects.all()
     serializer_class = WorkspaceMemberSerializer
+
+    def get_queryset(self):
+        workspace_id = self.kwargs.get('workspace_id')
+        return WorkspaceMember.objects.filter(workspace_id=workspace_id)
+    
+    def perform_create(self, serializer):
+        workspace_id = self.kwargs.get('workspace_id')
+        serializer.save(workspace_id=workspace_id)
