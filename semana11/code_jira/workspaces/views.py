@@ -7,6 +7,8 @@ from .serializers import (
     WorkspaceSerializer,
     WorkspaceMemberSerializer,
 )
+from projects.models import Project
+from projects.serializers import ProjectSerializer
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.permissions import IsAuthenticated
 
@@ -28,9 +30,12 @@ class WorkspaceView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         user = self.request.user
-        pass
-
-
+        workspace = serializer.save()
+        WorkspaceMember.objects.create(
+            workspace=workspace,
+            user=user,
+            role='OWNER'
+        )
 
 @extend_schema(tags=['Workspace'])
 @extend_schema_view(
@@ -65,13 +70,20 @@ class ManageWorkspaceView(generics.RetrieveUpdateDestroyAPIView):
         description='Añade un Usuario como Miembro de un Workspace. Solo accesible para usuarios autenticados.'
     )
 )
-class WorkspaceMemberView(generics.ListCreateAPIView):
+class WorkspaceMemberView(generics.CreateAPIView):
+    queryset = WorkspaceMember.objects.all()
     serializer_class = WorkspaceMemberSerializer
+
+@extend_schema(tags=['Workspace'])
+@extend_schema_view(
+    get=extend_schema(
+        summary='Listar todos los Projects',
+        description='Obtiene una lista paginada de todos los Projects activos de un Workspace'
+    )
+)
+class WorkspaceProjectsView(generics.ListAPIView):
+    serializer_class = ProjectSerializer
 
     def get_queryset(self):
         workspace_id = self.kwargs.get('workspace_id')
-        return WorkspaceMember.objects.filter(workspace_id=workspace_id)
-    
-    def perform_create(self, serializer):
-        workspace_id = self.kwargs.get('workspace_id')
-        serializer.save(workspace_id=workspace_id)
+        return Project.objects.filter(workspace_id=workspace_id)
