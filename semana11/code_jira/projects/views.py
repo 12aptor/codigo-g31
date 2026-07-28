@@ -12,6 +12,8 @@ from .serializers import (
 )
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
 
 @extend_schema(tags=['Project'])
 @extend_schema_view(
@@ -23,7 +25,7 @@ from rest_framework.response import Response
 class ProjectView(generics.CreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-
+    permission_classes = [IsAuthenticated]
 
 @extend_schema(tags=['Project'])
 @extend_schema_view(
@@ -48,9 +50,74 @@ class ManageProjectView(generics.RetrieveUpdateDestroyAPIView):
         instance.soft_delete()
 
 @extend_schema(tags=['Issue'])
+@extend_schema_view(
+    post=extend_schema(
+        summary='Crear un nuevo Issue',
+        description='Crea un Issue y permite adjuntar uno o más archivos en la misma peticion',
+        request={
+            'multipart/form-data': {
+                'type': 'object',
+                'properties': {
+                    'project': {
+                        'type': 'integer',
+                    },
+                    'title': {
+                        'type': 'string'
+                    },
+                    'description': {
+                        'type': 'string'
+                    },
+                    'status': {
+                        'type': 'string'
+                    },
+                    'priority': {
+                        'type': 'string'
+                    },
+                    'reporter': {
+                        'type': 'integer'
+                    },
+                    'assignee': {
+                        'type': 'integer',
+                        'nullable': True
+                    },
+                    'parent_issue': {
+                        'type': 'integer',
+                        'nullable': True
+                    },
+                    'due_date': {
+                        'type': 'string',
+                        'format': 'date-time',
+                        'nullable': True
+                    },
+                    'tags': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'integer',
+                        },
+                        'description': 'Lista de IDs de los Tags'
+                    },
+                    'uploaded_files': {
+                        'type': 'array',
+                        'items': {
+                            'type': 'string',
+                            'format': 'binary'
+                        },
+                        'description': 'Archivos adjuntos para el Issue'
+                    }
+                }
+            }
+        }
+    )
+)
 class IssueView(generics.CreateAPIView):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
+    parser_classes = (MultiPartParser, FormParser)
+
+    def get_serializer_context(self):
+        context = super().get_serializer_context()
+        context.update({"request": self.request})
+        return context
 
 @extend_schema(tags=['Issue'])
 class IssueStatusView(mixins.UpdateModelMixin, generics.GenericAPIView):
