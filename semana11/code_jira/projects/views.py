@@ -1,6 +1,15 @@
-from rest_framework import generics
-from .models import Project, Issue
-from .serializers import ProjectSerializer, IssueSerializer
+from rest_framework import generics, mixins
+from .models import (
+    Project,
+    Issue,
+    Tag
+)
+from .serializers import (
+    ProjectSerializer,
+    IssueSerializer,
+    TagSerializer,
+    IssueStatusSerializer,
+)
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework.response import Response
 
@@ -38,11 +47,20 @@ class ManageProjectView(generics.RetrieveUpdateDestroyAPIView):
     def perform_destroy(self, instance: Project):
         instance.soft_delete()
 
-
+@extend_schema(tags=['Issue'])
 class IssueView(generics.CreateAPIView):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
 
+@extend_schema(tags=['Issue'])
+class IssueStatusView(mixins.UpdateModelMixin, generics.GenericAPIView):
+    queryset = Issue.objects.all()
+    serializer_class = IssueStatusSerializer
+
+    def put(self, request, *args, **kwargs):
+        return self.update(request, *args, **kwargs)
+
+@extend_schema(tags=['Project'])
 class ProjectIssuesView(generics.ListAPIView):
     serializer_class = IssueSerializer
 
@@ -62,3 +80,13 @@ class ProjectIssuesView(generics.ListAPIView):
             grouped_data[issue['status']].append(issue)
 
         return Response(grouped_data)
+
+@extend_schema(tags=["Tag"])
+class TagView(generics.ListCreateAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
+
+@extend_schema(tags=["Tag"])
+class ManageTagView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Tag.objects.all()
+    serializer_class = TagSerializer
