@@ -53,59 +53,9 @@ class ManageProjectView(generics.RetrieveUpdateDestroyAPIView):
 @extend_schema_view(
     post=extend_schema(
         summary='Crear un nuevo Issue',
-        description='Crea un Issue y permite adjuntar uno o más archivos en la misma peticion',
+        description='Crea un Issue y permite adjuntar uno o más archivos en la misma petición',
         request={
-            'multipart/form-data': {
-                'type': 'object',
-                'properties': {
-                    'project': {
-                        'type': 'integer',
-                    },
-                    'title': {
-                        'type': 'string'
-                    },
-                    'description': {
-                        'type': 'string'
-                    },
-                    'status': {
-                        'type': 'string'
-                    },
-                    'priority': {
-                        'type': 'string'
-                    },
-                    'reporter': {
-                        'type': 'integer'
-                    },
-                    'assignee': {
-                        'type': 'integer',
-                        'nullable': True
-                    },
-                    'parent_issue': {
-                        'type': 'integer',
-                        'nullable': True
-                    },
-                    'due_date': {
-                        'type': 'string',
-                        'format': 'date-time',
-                        'nullable': True
-                    },
-                    'tags': {
-                        'type': 'array',
-                        'items': {
-                            'type': 'integer',
-                        },
-                        'description': 'Lista de IDs de los Tags'
-                    },
-                    'uploaded_files': {
-                        'type': 'array',
-                        'items': {
-                            'type': 'string',
-                            'format': 'binary'
-                        },
-                        'description': 'Archivos adjuntos para el Issue'
-                    }
-                }
-            }
+            'multipart/form-data': IssueSerializer
         }
     )
 )
