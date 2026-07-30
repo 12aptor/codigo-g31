@@ -36,17 +36,20 @@ class IssueSerializer(serializers.ModelSerializer):
         read_only_fields = ['deleted_at']
 
     def create(self, validated_data):
-        print(validated_data)
         uploaded_files = validated_data.pop('uploaded_files', [])
+        tags = validated_data.pop('tags', [])
 
         request = self.context.get('request')
         uploader = request.user
 
         issue = Issue.objects.create(**validated_data)
 
+        if tags:
+            issue.tags.set(tags)
+
         for file in uploaded_files:
             Attachment.objects.create(
-                issues=issue,
+                issue=issue,
                 file=file,
                 uploader=uploader
             )

@@ -112,6 +112,7 @@ class ManageProjectView(generics.RetrieveUpdateDestroyAPIView):
 class IssueView(generics.CreateAPIView):
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
+    permission_classes = [IsAuthenticated]
     parser_classes = (MultiPartParser, FormParser)
 
     def get_serializer_context(self):
